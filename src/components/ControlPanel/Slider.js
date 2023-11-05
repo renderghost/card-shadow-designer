@@ -1,19 +1,21 @@
+// Slider.js
+
 import React from 'react';
 
-function Slider({ label, value, min, max, step, onChange }) {
+const Slider = ({ label, value, min, max, onChange }) => {
     return (
-        <div className="Slider">
-            <label>{label}</label>
+        <label>
+            {label}:
             <input
                 type="range"
                 value={value}
                 min={min}
                 max={max}
-                step={step}
                 onChange={onChange}
             />
-        </div>
+            <span>{value}</span>
+        </label>
     );
-}
+};
 
 export default Slider;
