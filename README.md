@@ -1,70 +1,52 @@
-# Getting Started with Create React App
+# Lumen · Card Shadow Designer
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Design CSS card shadows by moving a light, not by pushing sliders. The shadow is
+worked out from the light's position, height, size and colour temperature, then
+exported as stacked `box-shadow` layers in plain values.
 
-## Available Scripts
+```sh
+npm install
+npm run dev     # http://localhost:5173
+npm test
+npm run build   # → dist/
+```
 
-In the project directory, you can run:
+## Controls
 
-### `npm start`
+| Action | What it does | Control |
+| --- | --- | --- |
+| Move a light | Take hold of a light and drag it | Drag a light |
+| Light distance | Slides the light along its line to the card | ⇧ Drag a light |
+| Light size | Bigger lights cast softer shadows | ⌃ ⇧ Drag a light |
+| Card elevation | Lifts the card off the page, or lowers it | ⇧ Drag the card |
+| Edit a light | Opens its panel: drag a value left or right, or click to type | Click a light or its button |
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Add up to three lights with **+** in the toolbar; remove them from their panel.
+Keys: `C` CSS · `S` save a sample · `L` show or hide the lights and geometry
+(they keep lighting the scene) · `F` full screen ·
+`H` hide the interface · `?` controls.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## The model
 
-### `npm test`
+World units are CSS pixels. The card floats at height `e` above the page and
+each light is a sphere of radius `R` at `(x, y, z)`, no more than 820 px from the
+card.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Key shadow, one per light.** The light projects the card onto the page,
+  scaled by `k = z / (z − e)`. The offset is `−(x, y)·(k − 1)`, the spread is
+  the growth in size, and the blur is the penumbra, `R·e / (z − e)`.
+- **Falloff.** Irradiance is inverse square times the cosine of the angle, so
+  farther lights cast fainter shadows.
+- **Colour.** Shadows are solved in linear light against the page colour. A
+  shadow keeps whatever light still reaches it, so a warm lamp in a cool room
+  casts a cool shadow.
+- **Ambient occlusion.** Three stacked shadows are fitted to the analytic sky
+  occlusion beside a floating plate, `(1 − x / √(x² + e²)) / 2`, to within 0.001.
+- **Rim light.** Inset shadows light the edge facing each light and shade the
+  opposite edge, most strongly when the light is low.
+- **States.** `:hover` lifts the card and `:active` presses it. The light stays
+  put, and every state has the same layer list, so the browser can transition
+  between them.
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The physics lives in [`src/lib/physics.js`](src/lib/physics.js). The CSS export
+is built in [`src/lib/css.js`](src/lib/css.js).
