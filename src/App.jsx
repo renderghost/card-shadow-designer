@@ -408,6 +408,8 @@ export default function App() {
       }
       touch(id);
     } else if (onCard && modifier) {
+      // Show the resting card while its resting height is being set.
+      cardStateRef.current = 'rest';
       beginDrag({ ...base, mode: 'elevation', start: sceneRef.current.elevation, cursor: 'ns-resize' });
     } else {
       cardStateRef.current = 'active';
@@ -450,12 +452,15 @@ export default function App() {
     dragRef.current = null;
     setDrag(null);
     if (d.mode === 'grab' && !d.moved) toggleLightPanel(d.id);
-    if (d.mode === 'press') cardStateRef.current = 'hover';
+    const overCard = document.elementFromPoint?.(e.clientX, e.clientY)?.closest('.card');
+    if (d.mode === 'press' || d.mode === 'elevation') cardStateRef.current = overCard ? 'hover' : 'rest';
     if (d.mode !== 'press' && d.mode !== 'elevation') touch(d.id);
   }, [toggleLightPanel, touch]);
 
+  // Pointer capture makes the card see the pointer leave as soon as a press
+  // starts, so its hover and press state is managed by the press itself.
   const onCardState = useCallback(state => {
-    if (dragRef.current && state !== 'rest') return;
+    if (dragRef.current) return;
     cardStateRef.current = state;
   }, []);
 

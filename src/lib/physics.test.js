@@ -84,6 +84,10 @@ describe('card states', () => {
     expect(stateElevation(16, 'active')).toBeLessThan(16);
   });
 
+  test('press always sets the card down 1px above the page, however high it was', () => {
+    for (const e of [0, 1, 16, 48]) expect(stateElevation(e, 'active')).toBe(1);
+  });
+
   test('every state has the same layers in the same order, so they can transition', () => {
     const s = scene([light(), light({ id: 2, x: 300, y: -100, kelvin: 2700 })]);
     const shape = e => shadowLayers(s, e).map(l => `${l.role}:${l.inset}`);
