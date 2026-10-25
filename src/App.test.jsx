@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, expect, test } from 'vitest';
 import App from './App';
 
@@ -86,6 +86,24 @@ test('one toggle, or L, hides the lights and their geometry but keeps their ligh
   expect(toggle).toHaveAttribute('aria-pressed', 'false');
   expect(container.querySelector('.stage')).not.toHaveClass('lights-hidden');
   expect(orbs()).toHaveLength(1);
+});
+
+test('pressing the card sets it down 1px above the page, even as the pointer is captured', async () => {
+  const { container } = render(<App />);
+  const card = container.querySelector('.card');
+  const label = () => container.querySelector('.card-elevation').textContent;
+  const settle = () => new Promise(resolve => setTimeout(resolve, 1200));
+
+  fireEvent.pointerEnter(card);
+  fireEvent.pointerDown(card, { button: 0, pointerId: 1 });
+  // Capturing the pointer on the stage makes the card see it leave.
+  fireEvent.pointerLeave(card);
+  await act(settle);
+  expect(label()).toBe('↑ 1 px');
+
+  fireEvent.pointerUp(card, { pointerId: 1 });
+  await act(settle);
+  expect(label()).toBe('↑ 16 px');
 });
 
 test('shortcuts stay out of the way while typing, and removed shortcuts do nothing', () => {

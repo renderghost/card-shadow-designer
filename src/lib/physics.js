@@ -175,10 +175,10 @@ export function lightLimits(light) {
   };
 }
 
-/** Elevation of the card in its interactive states. */
+/** Elevation of the card in its interactive states. Pressing always sets it down 1px above the page. */
 export function stateElevation(elevation, state) {
   if (state === 'hover') return elevation + Math.max(6, elevation * 0.6);
-  if (state === 'active') return elevation * 0.35;
+  if (state === 'active') return 1;
   return elevation;
 }
 

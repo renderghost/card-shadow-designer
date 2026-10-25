@@ -44,8 +44,8 @@ card.
   occlusion beside a floating plate, `(1 − x / √(x² + e²)) / 2`, to within 0.001.
 - **Rim light.** Inset shadows light the edge facing each light and shade the
   opposite edge, most strongly when the light is low.
-- **States.** `:hover` lifts the card and `:active` presses it. The light stays
-  put, and every state has the same layer list, so the browser can transition
+- **States.** `:hover` lifts the card and `:active` presses it down to 1 px above
+  the page, however high it was. The light stays put, and every state has the same layer list, so the browser can transition
   between them.
 
 The physics lives in [`src/lib/physics.js`](src/lib/physics.js). The CSS export
